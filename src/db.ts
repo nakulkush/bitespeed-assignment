@@ -26,7 +26,7 @@ export async function identifyContact(
   }
 
   const exactMatch = existing.find(
-    (c) => c.email === email && c.phoneNumber === phoneNumber
+    (c: any) => c.email === email && c.phoneNumber === phoneNumber
   );
 
   if (!exactMatch && hasNewInfo(existing, email, phoneNumber)) {
