@@ -1,5 +1,3 @@
----
-
 # Bitespeed Identity Reconciliation API
 
 > A Node.js-based service to unify and manage customer identities using contact information
