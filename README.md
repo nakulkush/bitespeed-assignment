@@ -1,44 +1,45 @@
+---
+
 # Bitespeed Identity Reconciliation API
 
-> A Node.js-based microservice to unify customer contact details across multiple data entries
+> A Node.js-based service to unify and manage customer identities using contact information
 
 ## 🚀 API Endpoints
 
-* *Base URL:* https://bitespeed-assignment-ktbc.onrender.com
-* *Identify Contact:* POST /identify
-* *Health Status:* GET /health
+* Base URL: (https://bitespeed-assignment-ktbc.onrender.com)
+* POST /identify – Identify or link customer profiles
+* GET /health – Check service availability
 
-## 📖 Description
+## 📖 Introduction
 
-This backend service—built with TypeScript and Express—intelligently identifies and merges customer records based on email and/or phone numbers. It keeps track of primary and linked secondary contacts to provide a consistent customer profile across different touchpoints.
+This Express + TypeScript backend service helps maintain a unified customer identity by connecting records that share the same email or phone number. It manages relationships between primary and secondary contacts, allowing businesses to get a single view of their customer across multiple interactions.
 
-## 🛠 Technology Stack
+## 🛠️ Technology Stack
 
-* *Runtime:* Node.js with TypeScript
-* *Framework:* Express.js
-* *Database:* PostgreSQL (managed via Prisma ORM)
-* *Validation:* Zod for schema enforcement
-* *Hosting:* Render.com
-* *Other Features:* CORS enabled, structured error responses, safe shutdown handling
+* Backend: Node.js + Express + TypeScript
+* Database: PostgreSQL using Prisma ORM
+* Input Validation: Zod
+* Deployment: Render.com
+* Key Add-ons: CORS support, structured error responses, clean shutdown on exit
 
-## 📡 API Reference
+## 📡 Endpoint Description
 
 ### POST /identify
 
-Unifies provided email and/or phone data with existing contact records, or creates a new one.
+Analyzes and links provided contact information with existing data or creates new entries accordingly.
 
-*Request Example:*
+Example Request:
 
-json
+```json
 {
   "email": "customer@example.com",
   "phoneNumber": "123456789"
 }
+```
 
+Successful Response:
 
-*Success Response (200 OK):*
-
-json
+```json
 {
   "contact": {
     "primaryContactId": 1,
@@ -47,127 +48,131 @@ json
     "secondaryContactIds": [2, 3]
   }
 }
+```
 
+Error Example (Invalid Input):
 
-*Validation Error Response (400):*
-
-json
+```json
 {
   "error": "Invalid input",
-  "details": [/* Zod schema error details */]
+  "details": [/* Validation error messages from Zod */]
 }
-
+```
 
 ### GET /health
 
-Returns basic health status of the service.
+Returns current health status of the service.
 
-*Sample Output:*
+Example Output:
 
-json
+```json
 {
   "status": "OK",
   "timestamp": "2024-01-01T12:00:00.000Z"
 }
+```
 
+## ⚙️ Identity Resolution Logic
 
-## 🧠 Core Logic Summary
+This service applies the following rules for identity consolidation:
 
-The contact reconciliation flow works as follows:
+1. No Match Found – A new primary contact is created
+2. Match Found – Returns existing consolidated record
+3. Partial Match – Adds new details as a secondary contact
+4. Multiple Primaries – Merges them with the oldest contact as the main record
 
-1. *Fresh Entry:* Creates a new primary record if no match exists
-2. *Match Found:* Returns existing grouped contact data
-3. *Partial Info:* Adds as secondary record if partial match (email/phone)
-4. *Conflict Resolution:* Merges multiple primaries by keeping the earliest as the main one
+Key Features:
 
-*Highlights:*
+* 🔁 Deduplication of customer contacts
+* 🔗 Linking secondary identities to a primary
+* 🔍 Smart merging of related records
+* 🗑️ Supports soft deletes via deletedAt column
+* 🔒 Validations handled by Zod
+* ⚠️ Descriptive and structured error reporting
 
-* ✅ Eliminates contact duplication
-* ✅ Handles multiple identities via linking
-* ✅ Merges multiple entries dynamically
-* ✅ Supports soft deletion with deletedAt
-* ✅ Strong request validation using Zod
-* ✅ Full-stack error reporting
+## 🧰 Setup Instructions
 
-## ⚙ Setup Guide
+To run locally:
 
-### Local Development
+Clone & Install:
 
-bash
-# Clone repo and install dependencies
+```bash
 git clone https://github.com/yourusername/bitespeed-identity-reconciliation.git
 cd bitespeed-identity-reconciliation
 npm install
+```
 
-# Setup environment variables
+Environment Setup:
+
+```bash
 echo 'DATABASE_URL="postgresql://user:pass@localhost:5432/bitespeed_db"' > .env
 echo 'PORT=3000' >> .env
+```
 
-# Initialize database
+Initialize the database:
+
+```bash
 npx prisma migrate dev
 npx prisma generate
+```
 
-# Run development or production server
-npm run dev    # Dev mode with live reload
-npm start      # Prod mode
+Run the app:
 
+```bash
+npm run dev    # For development
+npm start      # For production
+```
 
-## 🚀 Deployment on Render
+## 🌐 Render Deployment Guide
 
-### Steps to Deploy
+Steps:
 
-1. Connect your GitHub repo on Render
-2. Set service type to *Web Service*
-3. Define build command:
-
-   
+1. Connect GitHub repo to Render
+2. Set service type to “Web Service”
+3. Use this Build command:
    npm install && npx prisma generate && npm run build
-   
-4. Set start command:
-
-   
+4. Start command:
    npm start
-   
-5. Configure environment variables:
+5. Add environment variables:
+   DATABASE\_URL=postgresql://\[your-render-db-url]
+   NODE\_ENV=production
 
-   
-   DATABASE_URL=postgresql://[your-db-url]
-   NODE_ENV=production
-   
+## 📁 Project Structure
 
-## 📁 Project Layout
-
+The main source files are organized as follows:
 
 src/
-├── app.ts        # Core Express setup & routes
-├── server.ts     # Initializes HTTP server and handles signals
-├── db.ts         # Handles contact merge logic and DB access
-├── types.ts      # Type definitions and Zod schema
+├── app.ts        // Express app and middleware config
+├── server.ts     // Server initialization and shutdown logic
+├── db.ts         // Handles database logic for merging and linking
+├── types.ts      // Types and Zod schemas
 └── prisma/
-    └── schema.prisma  # Prisma DB schema definition
+└── schema.prisma  // Prisma DB model definition
 
+## 📦 NPM Scripts
 
-## 🧪 Scripts
+Available commands:
 
-bash
-npm run dev         # Starts dev server with hot reloading
-npm run build       # Compiles TypeScript
-npm start           # Runs production server
-npm run db:migrate  # Applies DB migrations
-npm run db:studio   # Launches Prisma Studio UI
+* npm run dev – Start dev server with hot reload
+* npm run build – Compile TypeScript to JavaScript
+* npm start – Launch production server
+* npm run db\:migrate – Apply DB migrations
+* npm run db\:studio – Open Prisma Studio interface
 
+## ⚡ Performance & Architecture Notes
 
-## ⚡ Optimization Details
-
-* Utilizes Prisma’s connection pooling
-* Supports graceful shutdown with signal handling
-* Enables cross-origin requests for client access
-* Validates and sanitizes inputs using Zod
-* Preserves soft-deleted records with deletedAt
-
----
-
-*🔗 Links:* [Live API](https://bitespeed-assignment-ktbc.onrender.com/identify) • [GitHub Repo](https://github.com/nakulkush/bitespeed-assignment) • [Health Endpoint](https://bitespeed-assignment-ktbc.onrender.com/health)
+* Efficient DB pooling via Prisma
+* Graceful termination using signal handlers
+* Cross-origin requests are supported
+* Validations prevent invalid or unsafe input
+* Uses soft deletion to avoid data loss
 
 ---
 
+🔗 Links:
+
+* Live API: (https://bitespeed-assignment-ktbc.onrender.com/identify)
+* GitHub: (https://github.com/nakulkush/bitespeed-assignment)
+* Health Check: (https://bitespeed-assignment-ktbc.onrender.com/health)
+
+Let me know if you'd like a version tailored for presentation, documentation site (like Docusaurus), or PDF export.
