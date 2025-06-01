@@ -173,4 +173,3 @@ Available commands:
 * GitHub: (https://github.com/nakulkush/bitespeed-assignment)
 * Health Check: (https://bitespeed-assignment-ktbc.onrender.com/health)
 
-Let me know if you'd like a version tailored for presentation, documentation site (like Docusaurus), or PDF export.
